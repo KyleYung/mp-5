@@ -1,34 +1,29 @@
 "use server";
 
-import getCollection, { URL_COLLECTION } from "@/db";
 import type { URL } from "@/types";
+import getCollection, { URL_COLLECTION } from "@/db";
 
-export default async function createUrl(url: string, alias: string): Promise<URL> {
+export default async function createUrl(url: string, alias: string): Promise<{success: boolean; data?: URL; error?: string}> {
 
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = "https://mp-5-nine.vercel.app/";
+
     const shortendUrl = `${baseUrl}/${alias}`;
 
-    const p = {
-        url: url,
-        alias: alias,
-        shortendUrl: shortendUrl,
-    };
-
     if (!url || url.trim() === "") {
-        throw new Error("ERROR: URL is required.");
+        return { success: false, error: "ERROR: Please enter a URL" };
     }
 
     try {
         const parsed = new URL(url);
 
         if (!["http:", "https:"].includes(parsed.protocol)) {
-            throw new Error("ERROR: URL must start with http:// or https://");
+            return { success: false, error: "ERROR: URL must start with http:// or https://" };
         }
 
-    } catch (e) {
-        console.error("[createUrl] Invalid URL:", e);
-        
-        throw new Error("ERROR: Invalid URL Format");
+    } catch {
+        return { 
+            success: false, error: "ERROR: Invalid URL Format" 
+        };
     }
 
     try {
@@ -36,35 +31,37 @@ export default async function createUrl(url: string, alias: string): Promise<URL
             method: "HEAD",
             redirect: "follow",
             headers: {
-              "User-Agent": "Mozilla/5.0"
+                "User-Agent": "Mozilla/5.0"
             }
         });
-          
-        if (!response.ok) {
-            console.warn("[createUrl] Target responded with:", response.status);
 
-            throw new Error("ERROR: Target site is unreachable");
+        if (!response.ok) {
+            return {
+                success: false, error: "ERROR: Unable to reach target site"
+            };
         }
 
-    } catch (e) {
-        console.error("[createUrl] Fetch failed:", e);
-
-        throw new Error("ERROR: Couldn't reach target domain");
+    } catch {
+        return {
+            success: false, error: "ERROR: Unable to reach target domain"
+        };
     }
 
     const urlCollection = await getCollection(URL_COLLECTION);
 
-    const existing = await urlCollection.findOne({alias});
+    const existing = await urlCollection.findOne({ alias });
 
     if (existing) {
-        throw new Error("ERROR: Alias already exists");
+        return { success: false, error: "Alias already exists. Please choose a different one." };
     }
 
-    const res = await urlCollection.insertOne({...p});
+    const res = await urlCollection.insertOne({ url, alias, shortendUrl });
 
     if (!res.acknowledged) {
-        throw new Error("DB insert failed");
+        return { success: false, error: "DB insert failed" };
     }
 
-    return { ...p, id: res.insertedId.toHexString() };
+    return {
+        success: true, data: { url, alias, shortendUrl, id: res.insertedId.toHexString() }
+    };
 }
