@@ -1,3 +1,5 @@
+"use client";
+
 import { URL } from "@/types";
 import { Button } from "@mui/material";
 
