@@ -1,3 +1,5 @@
+"use client";
+
 import createUrl from "@/lib/createUrl";
 import { URL } from "@/types";
 import {Textarea} from "@mui/joy";
