@@ -15,7 +15,7 @@ export default async function createUrl(url: string, alias: string): Promise<URL
     };
 
     if (!url || url.trim() === "") {
-        throw new Error("URL is required.");
+        throw new Error("ERROR: URL is required.");
     }
 
     try {

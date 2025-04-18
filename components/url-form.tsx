@@ -17,7 +17,7 @@ export default function UrlForm({append}: {append: (post: URL) => void}) {
                 className="flex flex-col items-center" onSubmit={(e) => {
                     e.preventDefault();
                     setError("");
-                    createUrl(url, alias).then((p: URL) => append(p)).catch((err: any) => {
+                    createUrl(url, alias).then((p) => append(p)).catch((err) => {
                         if (err.message && err.message.includes("Invalid URL")) {
                             setError("Enter a valid URL");
                         } else if (err.message && err.message.includes("Alias already exists")) {
