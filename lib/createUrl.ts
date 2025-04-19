@@ -5,7 +5,7 @@ import getCollection, { URL_COLLECTION } from "@/db";
 
 export default async function createUrl(url: string, alias: string): Promise<{success: boolean; data?: URL; error?: string}> {
 
-    const baseUrl = "https://mp-5-nine.vercel.app/";
+    const baseUrl = "https://mp-5-nine.vercel.app";
 
     const shortendUrl = `${baseUrl}/${alias}`;
 
