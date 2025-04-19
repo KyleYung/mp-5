@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import getCollection, { URL_COLLECTION } from "@/db";
 
-export default async function AliasPage({params} : {params: Promise<{alias: string}>}) {
+export default async function AliasPage({params} : {params: {alias: string}}) {
     const {alias} = await params;
 
     const collection = await getCollection(URL_COLLECTION);
@@ -13,6 +13,5 @@ export default async function AliasPage({params} : {params: Promise<{alias: stri
     }
 
     redirect(record.url);
-
-  return null;
+    return null;
 }
